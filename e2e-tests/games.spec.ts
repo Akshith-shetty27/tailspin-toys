@@ -134,3 +134,48 @@ test.describe('Game Listing and Navigation', () => {
     });
   });
 });
+
+test.describe('Game Catalog Filters', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/');
+    await expect(page.getByTestId('games-grid')).toBeVisible();
+  });
+
+  test('filters games by category', async ({ page }) => {
+    await page.getByTestId('category-filter-2').check();
+
+    await expect(page).toHaveURL(/category=2/);
+    await expect(page.locator('[data-testid="game-card"]:visible')).toHaveCount(4);
+    await expect(page.locator('[data-testid="game-card"]:visible').first()).toContainText('Bug Buster Brainteaser');
+    await expect(page.getByTestId('filter-result-summary')).toHaveText('Showing 4 of 21 games');
+  });
+
+  test('combines category and publisher filters', async ({ page }) => {
+    await page.getByTestId('category-filter-2').check();
+    await page.getByTestId('publisher-filter').selectOption({ label: 'CodeForge Studios' });
+
+    await expect(page).toHaveURL(/category=2&publisher=1/);
+    await expect(page.locator('[data-testid="game-card"]:visible')).toHaveCount(1);
+    await expect(page.locator('[data-testid="game-card"]:visible')).toContainText('Code Puzzle Chronicles');
+  });
+
+  test('supports multiple categories and clearing filters', async ({ page }) => {
+    await page.getByTestId('category-filter-1').check();
+    await page.getByTestId('category-filter-2').check();
+
+    await expect(page.locator('[data-testid="game-card"]:visible')).toHaveCount(8);
+    await expect(page.getByTestId('filter-result-summary')).toHaveText('Showing 8 of 21 games');
+
+    await page.getByTestId('clear-filters').click();
+    await expect(page).toHaveURL('/');
+    await expect(page.getByTestId('filter-result-summary')).toHaveText('Showing all games');
+  });
+
+  test('shows an empty state when no game matches the filters', async ({ page }) => {
+    await page.goto('/?category=999');
+
+    await expect(page.locator('[data-testid="game-card"]:visible')).toHaveCount(0);
+    await expect(page.getByTestId('filtered-empty-state')).toBeVisible();
+    await expect(page.getByTestId('empty-state-text')).toHaveText('No games match those filters.');
+  });
+});
