@@ -1,10 +1,11 @@
 ---
 description: 'Central UI strategy and component development philosophy'
+applyTo: '**/*.astro'
 ---
 
 # UI Component Strategy
 
-This file defines the central UI development strategy for Tailspin Toys. Technology-specific guidance is in separate instruction files.
+This file defines the central UI development strategy for Tailspin Toys. It applies to all Astro UI work and complements the more specific guidance in the technology files (`astro.instructions.md`, `style.instructions.md`, and the interaction tests in `playwright.instructions.md`).
 
 ## Component Architecture
 
